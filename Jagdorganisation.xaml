@@ -1,0 +1,15 @@
+﻿<Window x:Class="Jagdorganisation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Jagdorganisation"
+        mc:Ignorable="d"
+        Title="Jagdorganisation" Height="359" Width="522">
+    <Grid>
+        <Button x:Name="PrintButton" Content="Einteilung drucken" HorizontalAlignment="Left" Margin="150,124,0,0" VerticalAlignment="Top" Width="130" IsDefault="True" Height="26" Click="PrintButton_Click"/>
+        <Button Content="Einstellungen" HorizontalAlignment="Left" Margin="150,168,0,0" VerticalAlignment="Top" Width="130" Height="26"/>
+        <Button x:Name="CloseButton" Content="Beenden" HorizontalAlignment="Left" Margin="353,230,0,0" VerticalAlignment="Top" Width="100" Height="26" Click="CloseButton_Click"/>
+
+    </Grid>
+</Window>
