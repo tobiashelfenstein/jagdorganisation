@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections;
@@ -25,8 +26,6 @@ namespace Jagdorganisation
 
         ~HunterGroupPrinter()
         {
-            Console.WriteLine("Destruktor wird aufgerufen");
-
             // close excel connection and all workbooks
             _temp_workbook.Close(false);
             Marshal.FinalReleaseComObject(_temp_workbook);
@@ -53,7 +52,7 @@ namespace Jagdorganisation
 
             // calculate some numbers for progress bar
             double num_groups = source_sheet.Range["C6:D35"].Rows.Count; // JAEGERGRUPPEN
-            double num_leaders = _xlApp.WorksheetFunction.CountA(source_sheet.Range["E6:E35"]);
+            double num_leaders = _xlApp.WorksheetFunction.CountA(source_sheet.Range["E6:E35"]); // ANSTELLER
             double num_shooters = _xlApp.WorksheetFunction.CountA(source_sheet.Range["G6:G35"]); // SCHUETZEN
             double num_dogs = _xlApp.WorksheetFunction.CountA(source_sheet.Range["I6:I35"]); // HUNDE
             double num_reserves = _xlApp.WorksheetFunction.CountA(source_sheet.Range["J6:J35"]); // ERSATZ
@@ -85,10 +84,7 @@ namespace Jagdorganisation
                     
                     // unlock sheet if locked
                     // new locking is not necessary
-                    if (copied_sheet.ProtectContents)
-                    {
-                        copied_sheet.Unprotect("pljagdfa39");
-                    }
+                    if (copied_sheet.ProtectContents) { copied_sheet.Unprotect("pljagdfa39"); }
 
                     // prepare values in sheet
                     copied_sheet.Name = cell.Text;
@@ -98,36 +94,51 @@ namespace Jagdorganisation
             }
         }
 
-        public void PrintCards(string group)
+        public void PrintCards(string group, bool? separator)
         {
-            string separator_text = "";
+            string title_text = "";
             string data_range = "";
             switch (group)
             {
-                case "ANSTELLER":
-                    separator_text = "Ansteller";
-                    data_range = "";
+                case "Ansteller":
+                    title_text = "Ansteller";
+                    data_range = "E6:E35";
                     break;
 
-                case "SCHUETZEN":
-                    separator_text = "Standkarten";
+                case "Standschützen":
+                    title_text = "Standkarte";
                     data_range = "G6:G35";
                     break;
 
-                case "HUNDE":
-                    separator_text = "Hundestände";
+                case "Hundestände":
+                    title_text = "Hundestand";
                     data_range = "I6:I35";
                     break;
 
-                case "ERSATZ":
-                    separator_text = "Ersatzstände";
+                case "Ersatzstände":
+                    title_text = "Ersatzstand";
                     data_range = "J6:J35";
                     break;
             }
 
             // print out separator
-            PrintSeparator(separator_text);
+            if (separator == true) { PrintSeparator(group); }
 
+            // print sheets for specified group
+            PrintSheets(data_range, title_text);
+        }
+
+        private void PrintSeparator(string separator_text)
+        {
+            // change separator text
+            _temp_workbook.Sheets["trennblatt"].Cells[1, 1].Value = separator_text;
+
+            // print out
+            _temp_workbook.Sheets["trennblatt"].PrintOut();
+        }
+
+        private void PrintSheets(string data_range, string title_text)
+        {
             xl.Range print_range = _source_workbook.Sheets["einteilung"].Range[data_range];
             foreach (xl.Range cell in print_range)
             {
@@ -135,21 +146,10 @@ namespace Jagdorganisation
                 if (copies > 0)
                 {
                     int row = cell.Row - print_range.Row + 1;
-                    _temp_workbook.Sheets[row].Shapes.Item["TextField"].TextFrame.Characters.Text = separator_text;
+                    _temp_workbook.Sheets[row].Shapes.Item["TextField"].TextFrame.Characters.Text = title_text;
                     _temp_workbook.Sheets[row].PrintOut(Copies: copies);
                 }
             }
-
-            _temp_workbook.SaveAs("\\\\mmedia\\users\\tobias\\tmp\\testfile.xlsx");
-        }
-
-        public void PrintSeparator(string separator_text)
-        {
-            // change separator text
-            _temp_workbook.Sheets["trennblatt"].Cells[1, 1].Value = separator_text;
-
-            // print out
-            _temp_workbook.Sheets["trennblatt"].PrintOut();
         }
     }
 }

@@ -5,11 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Jagdorganisation"
         mc:Ignorable="d"
-        Title="Jagdorganisation" Height="359" Width="522">
+        Title="Jagdorganisation" Height="210" Width="300">
     <Grid>
-        <Button x:Name="PrintButton" Content="Einteilung drucken" HorizontalAlignment="Left" Margin="150,124,0,0" VerticalAlignment="Top" Width="130" IsDefault="True" Height="26" Click="PrintButton_Click"/>
-        <Button Content="Einstellungen" HorizontalAlignment="Left" Margin="150,168,0,0" VerticalAlignment="Top" Width="130" Height="26"/>
-        <Button x:Name="CloseButton" Content="Beenden" HorizontalAlignment="Left" Margin="353,230,0,0" VerticalAlignment="Top" Width="100" Height="26" Click="CloseButton_Click"/>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="PrintButton" Content="Einteilung drucken" HorizontalAlignment="Left" Margin="150,32,0,0" VerticalAlignment="Top" Width="120" IsDefault="True" Height="26" Click="PrintButton_Click"/>
+        <Button x:Name="SettingsButton" Content="Einstellungen" HorizontalAlignment="Left" Margin="150,101,0,0" VerticalAlignment="Top" Width="120" Height="26"/>
+        <Button x:Name="CloseButton" Content="Beenden" HorizontalAlignment="Left" Margin="150,132,0,0" VerticalAlignment="Top" Width="120" Height="26" Click="CloseButton_Click"/>
+        <GroupBox Header="Druckauswahl" HorizontalAlignment="Left" Height="150" Margin="10,10,0,0" VerticalAlignment="Top" Width="120">
+            <Grid HorizontalAlignment="Left" Height="127" Margin="4,10,-2,-13" VerticalAlignment="Top" Width="100">
+                <CheckBox x:Name="LeaderCheckBox" Content="Ansteller" Margin="0,0,3,0" VerticalAlignment="Top"/>
+                <CheckBox x:Name="ShootersCheckBox" Content="Standschützen" HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.144,3.2"/>
+                <CheckBox x:Name="DogsCheckBox" Content="Hundestände" HorizontalAlignment="Left" Margin="0,40,0,0" VerticalAlignment="Top"/>
+                <CheckBox x:Name="ReservesCheckBox" Content="Ersatzstände" HorizontalAlignment="Left" Margin="0,60,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.085,-0.333"/>
+                <Separator HorizontalAlignment="Left" Height="10" Margin="0,80,0,0" VerticalAlignment="Top" Width="100"/>
+                <CheckBox x:Name="SeparatorCheckBox" Content="Trennblätter" HorizontalAlignment="Left" Margin="0,95,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
 
     </Grid>
 </Window>

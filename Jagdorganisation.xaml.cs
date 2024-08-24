@@ -24,6 +24,7 @@ namespace Jagdorganisation
     /// </summary>
     public partial class MainWindow : Window
     {
+        private HunterGroupPrinter _printer;
         public MainWindow()
         {
             InitializeComponent();
@@ -41,7 +42,6 @@ namespace Jagdorganisation
             // select only excel files
             var open_dialog = new Microsoft.Win32.OpenFileDialog();
             open_dialog.Title = "Jagdeinteilung laden";
-            //open_dialog.DefaultExt = ".xlsx";
             open_dialog.Filter = "Jagdeinteilung (.xlsx)|*.xlsx";
 
             // show open file dialog box
@@ -52,88 +52,38 @@ namespace Jagdorganisation
             if (result == true)
             {
                 source_file = open_dialog.FileName;
-                // datei überprüfen
-                Console.WriteLine(source_file);
             }
             else
             {
                 return;
             }
 
-            HunterGroupPrinter printer = new HunterGroupPrinter();
-            printer.CreateCardsFromSource(source_file);
-            printer.PrintCards("ERSATZ");
+            _printer = new HunterGroupPrinter();
+            _printer.CreateCardsFromSource(source_file);
 
-            // start excel connection
-            /*xl.Application xlApp = new xl.Application();
-            xlApp.SheetsInNewWorkbook = 1;
-            xl.Workbooks workbooks = xlApp.Workbooks;
-            xl.Workbook workbook = workbooks.Open(source_file);
+            // create array with checkboxes for printing groups
+            CheckBox[] check_boxes = new CheckBox[] {
+                LeaderCheckBox,
+                ShootersCheckBox,
+                DogsCheckBox,
+                ReservesCheckBox
+            };
 
-            xl.Worksheet source_sheet = workbook.Sheets["einteilung"];
-
-            // calculate some numbers
-            double num_groups = source_sheet.Range["C6:D35"].Rows.Count; // JAEGERGRUPPEN
-            double num_leaders = xlApp.WorksheetFunction.CountA(source_sheet.Range["E6:E35"]);
-            double num_shooters = xlApp.WorksheetFunction.CountA(source_sheet.Range["G6:G35"]);
-            double num_dogs = xlApp.WorksheetFunction.CountA(source_sheet.Range["I6:I35"]);
-            double num_reserves = xlApp.WorksheetFunction.CountA(source_sheet.Range["J6:J35"]);
-
-            // create temporary workbook with only one sheet
-            xl.Workbook temp_workbook = workbooks.Add();
-
-            // set up first sheet as separator
-            //temp_workbook.Worksheets.Add(After: temp_workbook.Sheets[temp_workbook.Sheets.Count]);
-            temp_workbook.ActiveSheet.Name = "Trennblatt";
-            temp_workbook.ActiveSheet.Cells[1, 1].Value = "Trennblatttext";
-            temp_workbook.ActiveSheet.Cells[1, 1].Font.Name = "Arial";
-            temp_workbook.ActiveSheet.Cells[1, 1].Font.Size = 72;
-            temp_workbook.ActiveSheet.PageSetup.CenterHorizontally = true;
-            temp_workbook.ActiveSheet.PageSetup.CenterVertically = true;
-            temp_workbook.ActiveSheet.PageSetup.Orientation = xl.XlPageOrientation.xlLandscape;
-
-            xl.Range source_range = source_sheet.Range["C6:D35"]; // JAEGERGRUPPEN
-            foreach (xl.Range cell in source_range)
-            {
-                if (cell.Text != "")
-                {
-                    workbook.Sheets["standkarte"].Copy(Before: temp_workbook.Sheets[temp_workbook.Sheets.Count]);
-                    temp_workbook.ActiveSheet.Name = cell.Text;
-                    temp_workbook.ActiveSheet.Range["B15"].Value2 = source_sheet.Range["A" + cell.Row].Value2; // NUMMER
-                    temp_workbook.ActiveSheet.Range["C15"].Value2 = cell.Text; // ANSTELLER
-                }
-            }
-
-            // print cards out
-            Console.WriteLine("Karten werden gedruckt");
-
-
-            //temp_workbook.SaveAs("\\\\mmedia\\users\\tobias\\tmp\\testfile.xlsx");
-
-            //Console.WriteLine(sheet.Cells[2, 1].Value.ToString());
-            //Console.WriteLine(sheet.Range["C6:D35"].Rows.Count);
-
-            // close excel connection
-            temp_workbook.Close(false);
-            Marshal.FinalReleaseComObject(temp_workbook);
-            temp_workbook = null;
-
-            workbook.Close(false, source_file, null);
-            Marshal.FinalReleaseComObject(workbook);
-            workbook = null;
-
-            workbooks.Close();
-            Marshal.FinalReleaseComObject(workbooks);
-            workbooks = null;
-
-            xlApp.Quit();
-            Marshal.FinalReleaseComObject(xlApp);
-            xlApp = null;
-*/
+            // define the print action
+            // then execute the print action for each array element
+            Action<CheckBox> print = new Action<CheckBox>(PrintGroups);
+            Array.ForEach(check_boxes, print);
         }
 
-        private void printCardsOut(string group)
+        private void PrintGroups(CheckBox box)
         {
+            // check, if the separator sheet should print
+            bool? separator = SeparatorCheckBox.IsChecked;
+
+            // print out if the box is checked
+            if (box.IsChecked == true) { _printer.PrintCards(box.Content.ToString(), separator); }
+
+            // timer before next print action
 
         }
     }
