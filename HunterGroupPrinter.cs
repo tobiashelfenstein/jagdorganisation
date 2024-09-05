@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-using System.Collections;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using xl = Microsoft.Office.Interop.Excel;
 
 namespace Jagdorganisation
@@ -50,13 +42,6 @@ namespace Jagdorganisation
             _source_workbook = _workbooks.Open(source_file);
             xl.Worksheet source_sheet = _source_workbook.Sheets["einteilung"];
 
-            // calculate some numbers for progress bar
-            double num_groups = source_sheet.Range["C6:D35"].Rows.Count; // JAEGERGRUPPEN
-            double num_leaders = _xlApp.WorksheetFunction.CountA(source_sheet.Range["E6:E35"]); // ANSTELLER
-            double num_shooters = _xlApp.WorksheetFunction.CountA(source_sheet.Range["G6:G35"]); // SCHUETZEN
-            double num_dogs = _xlApp.WorksheetFunction.CountA(source_sheet.Range["I6:I35"]); // HUNDE
-            double num_reserves = _xlApp.WorksheetFunction.CountA(source_sheet.Range["J6:J35"]); // ERSATZ
-
             // create temporary workbook with only one sheet
             _temp_workbook = _workbooks.Add();
 
@@ -81,7 +66,7 @@ namespace Jagdorganisation
 
                     // get the active sheet as copied sheet
                     xl.Worksheet copied_sheet = _temp_workbook.ActiveSheet;
-                    
+
                     // unlock sheet if locked
                     // new locking is not necessary
                     if (copied_sheet.ProtectContents) { copied_sheet.Unprotect("pljagdfa39"); }

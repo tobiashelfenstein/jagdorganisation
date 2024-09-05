@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("Jagdorganisation")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Landesforsten Rheinland-Pfalz | Tobias Helfenstein <tobias.helfenstein@wald-rlp.de>")]
 [assembly: AssemblyProduct("Jagdorganisation")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]

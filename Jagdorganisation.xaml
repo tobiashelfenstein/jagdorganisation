@@ -13,7 +13,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="PrintButton" Content="Einteilung drucken" HorizontalAlignment="Left" Margin="150,83,0,0" VerticalAlignment="Top" Width="120" IsDefault="True" Height="26" Click="PrintButton_Click"/>
+        <Button x:Name="PrintButton" Content="Einteilung drucken" HorizontalAlignment="Left" Margin="150,71,0,0" VerticalAlignment="Top" Width="120" IsDefault="True" Height="26" Click="PrintButton_Click"/>
         <Button x:Name="SettingsButton" Content="Einstellungen" HorizontalAlignment="Left" Margin="150,152,0,0" VerticalAlignment="Top" Width="120" Height="26"/>
         <Button x:Name="CloseButton" Content="Beenden" HorizontalAlignment="Left" Margin="150,183,0,0" VerticalAlignment="Top" Width="120" Height="26" Click="CloseButton_Click"/>
         <GroupBox Header="Druckauswahl" HorizontalAlignment="Left" Height="150" Margin="10,61,0,0" VerticalAlignment="Top" Width="120">
@@ -29,6 +29,7 @@
         <Label x:Name="StatusLabel" Content="Status:" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.111,-0.192" Padding="0,5"/>
         <Label x:Name="StatusInfoText" Content="keine Einteilung geladen" HorizontalAlignment="Left" Margin="50,6,0,0" VerticalAlignment="Top" Padding="0,5,5,5" Width="220"/>
         <ProgressBar x:Name="ProgressBar" HorizontalAlignment="Left" Height="20" Margin="10,30,0,0" VerticalAlignment="Top" Width="260"/>
+        <Button x:Name="AbortButton" Content="Abbrechen" HorizontalAlignment="Left" Margin="150,102,0,0" VerticalAlignment="Top" Width="120" Height="26" IsCancel="True" IsEnabled="False" Click="AbortButton_Click"/>
 
     </Grid>
 </Window>
