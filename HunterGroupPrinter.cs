@@ -3,29 +3,42 @@ using xl = Microsoft.Office.Interop.Excel;
 
 namespace Jagdorganisation
 {
-    class HunterGroupPrinter
+    public class HunterGroupPrinter
     {
+        private struct PrintData
+        {
+            public string Title;
+            public string Range;
+        }
+
         private xl.Application _xlApp;
         private xl.Workbooks _workbooks;
-        private xl.Workbook _source_workbook;
-        private xl.Workbook _temp_workbook;
+        private xl.Workbook _src_wkb;
+        private xl.Workbook _tmp_wkb;
+
+        private string _data_sht_name;
+        private string _tmpl_sht_name;
         public HunterGroupPrinter()
         {
             // every new created workbook has only one sheet
             _xlApp = new xl.Application { SheetsInNewWorkbook = 1 };
             _workbooks = _xlApp.Workbooks;
+
+            // read from config
+            _data_sht_name = Properties.Settings.Default.DataSheet;
+            _tmpl_sht_name = Properties.Settings.Default.TemplateSheet;
         }
 
         ~HunterGroupPrinter()
         {
             // close excel connection and all workbooks
-            _temp_workbook.Close(false);
-            Marshal.FinalReleaseComObject(_temp_workbook);
-            _temp_workbook = null;
+            _tmp_wkb.Close(false);
+            Marshal.FinalReleaseComObject(_tmp_wkb);
+            _tmp_wkb = null;
 
-            _source_workbook.Close(false);
-            Marshal.FinalReleaseComObject(_source_workbook);
-            _source_workbook = null;
+            _src_wkb.Close(false);
+            Marshal.FinalReleaseComObject(_src_wkb);
+            _src_wkb = null;
 
             _workbooks.Close();
             Marshal.FinalReleaseComObject(_workbooks);
@@ -36,105 +49,132 @@ namespace Jagdorganisation
             _xlApp = null;
         }
 
-        public void CreateCardsFromSource(string source_file)
+        public void CreateCardsFromSource(string src_file)
         {
-            // open source file with all data
-            _source_workbook = _workbooks.Open(source_file);
-            xl.Worksheet source_sheet = _source_workbook.Sheets["einteilung"];
+            // get necessary config data
+            string grp_range_str = Properties.Settings.Default.HuntingGroups; // JAEGERGRUPPEN
+            string sht_password = Properties.Settings.Default.SheetPassword;
+            string number_clmn = Properties.Settings.Default.NumberColumn;
+            string number_cell = Properties.Settings.Default.NumberCell; // GRUPPENNUMMER
+            string leader_cell = Properties.Settings.Default.LeaderCell; // ANSTELLER
 
+            // first open source file with all data
+            _src_wkb = _workbooks.Open(src_file);
+            xl.Worksheet src_sht = _src_wkb.Sheets[_data_sht_name];
+
+            // then create temporary workbook with separator sheet
+            _tmp_wkb = CreateTmpWkbWithSeparator();
+
+            // now copy hunter sheet for every group
+            xl.Range src_range = src_sht.Range[grp_range_str];
+            foreach (xl.Range cell in src_range)
+            {
+                // when the row has no entry, skip this iteration step
+                if (cell.Text == "")
+                {
+                    continue;
+                }
+
+                // copy sheet after the last sheet in workbook
+                xl.Worksheet last_sht = _tmp_wkb.Sheets[_tmp_wkb.Sheets.Count];
+                _src_wkb.Sheets[_tmpl_sht_name].Copy(Before: last_sht);
+
+                // get the active sheet as copied sheet
+                xl.Worksheet cp_sht = _tmp_wkb.ActiveSheet;
+
+                // unlock sheet if locked
+                // new locking is not necessary
+                if (cp_sht.ProtectContents)
+                {
+                    cp_sht.Unprotect(sht_password);
+                }
+
+                // modify the copied sheet
+                cp_sht.Name = cell.Text;
+                cp_sht.Range[number_cell].Value2 = src_sht.Range[number_clmn + cell.Row].Value2; // A + 3 = A3
+                cp_sht.Range[leader_cell].Value2 = cell.Text;
+            }
+        }
+
+        private xl.Workbook CreateTmpWkbWithSeparator()
+        {
             // create temporary workbook with only one sheet
-            _temp_workbook = _workbooks.Add();
+            xl.Workbook workbook = _workbooks.Add();
 
             // set up first sheet as separator
-            _temp_workbook.Sheets[1].Name = "Trennblatt";
-            _temp_workbook.Sheets[1].Cells[1, 1].Value = "Trennblatttext";
-            _temp_workbook.Sheets[1].Cells[1, 1].Font.Name = "Arial";
-            _temp_workbook.Sheets[1].Cells[1, 1].Font.Size = 72;
-            _temp_workbook.Sheets[1].PageSetup.CenterHorizontally = true;
-            _temp_workbook.Sheets[1].PageSetup.CenterVertically = true;
-            _temp_workbook.Sheets[1].PageSetup.Orientation = xl.XlPageOrientation.xlLandscape;
+            workbook.Sheets[1].Name = "Trennblatt";
+            workbook.Sheets[1].Cells[1, 1].Value = "Trennblatttext";
+            workbook.Sheets[1].Cells[1, 1].Font.Name = "Arial";
+            workbook.Sheets[1].Cells[1, 1].Font.Size = 72;
+            workbook.Sheets[1].PageSetup.CenterHorizontally = true;
+            workbook.Sheets[1].PageSetup.CenterVertically = true;
+            workbook.Sheets[1].PageSetup.Orientation = xl.XlPageOrientation.xlLandscape;
 
-            // copy hunter sheet for every group
-            xl.Range source_range = source_sheet.Range["C6:D35"]; // JAEGERGRUPPEN
-            foreach (xl.Range cell in source_range)
+            return workbook;
+        }
+
+        public void PrintCards(string group, bool separator)
+        {
+            // determine group type title and data range for printing
+            PrintData prt_data = DeterminePrintData(group);
+
+            // print out separator
+            if (separator)
             {
-                if (cell.Text != "")
+                PrintSeparator(group);
+            }
+
+            // print sheets for specified group
+            xl.Range prt_range = _src_wkb.Sheets[_data_sht_name].Range[prt_data.Range];
+            foreach (xl.Range cell in prt_range)
+            {
+                // if cell.Value2 is null, set it to 0
+                double copies = cell.Value2 ?? 0;
+                if (copies > 0)
                 {
-                    // copy sheet after the last sheet in workbook
-                    xl.Worksheet last_sheet = _temp_workbook.Sheets[_temp_workbook.Sheets.Count];
-                    _source_workbook.Sheets["standkarte"].Copy(Before: last_sheet);
-
-                    // get the active sheet as copied sheet
-                    xl.Worksheet copied_sheet = _temp_workbook.ActiveSheet;
-
-                    // unlock sheet if locked
-                    // new locking is not necessary
-                    if (copied_sheet.ProtectContents) { copied_sheet.Unprotect("pljagdfa39"); }
-
-                    // prepare values in sheet
-                    copied_sheet.Name = cell.Text;
-                    copied_sheet.Range["B15"].Value2 = source_sheet.Range["A" + cell.Row].Value2; // NUMMER
-                    copied_sheet.Range["C15"].Value2 = cell.Text; // ANSTELLER
+                    int row = cell.Row - prt_range.Row + 1; // + 1 is for current row
+                    _tmp_wkb.Sheets[row].Shapes.Item["TextField"].TextFrame.Characters.Text = prt_data.Title;
+                    _tmp_wkb.Sheets[row].PrintOut(Copies: copies);
                 }
             }
         }
 
-        public void PrintCards(string group, bool? separator)
+        private PrintData DeterminePrintData(string group)
         {
-            string title_text = "";
-            string data_range = "";
+            PrintData data = new PrintData();
             switch (group)
             {
                 case "Ansteller":
-                    title_text = "Ansteller";
-                    data_range = "E6:E35";
+                    data.Title = "Ansteller";
+                    data.Range = Properties.Settings.Default.Leader;
                     break;
 
                 case "Standschützen":
-                    title_text = "Standkarte";
-                    data_range = "G6:G35";
+                    data.Title = "Standkarte";
+                    data.Range = Properties.Settings.Default.Shooters;
                     break;
 
                 case "Hundestände":
-                    title_text = "Hundestand";
-                    data_range = "I6:I35";
+                    data.Title = "Hundestand";
+                    data.Range = Properties.Settings.Default.Dogs;
                     break;
 
                 case "Ersatzstände":
-                    title_text = "Ersatzstand";
-                    data_range = "J6:J35";
+                    data.Title = "Ersatzstand";
+                    data.Range = Properties.Settings.Default.Reserves;
                     break;
             }
 
-            // print out separator
-            if (separator == true) { PrintSeparator(group); }
-
-            // print sheets for specified group
-            PrintSheets(data_range, title_text);
+            return data;
         }
 
         private void PrintSeparator(string separator_text)
         {
             // change separator text
-            _temp_workbook.Sheets["trennblatt"].Cells[1, 1].Value = separator_text;
+            _tmp_wkb.Sheets["trennblatt"].Cells[1, 1].Value = separator_text;
 
             // print out
-            _temp_workbook.Sheets["trennblatt"].PrintOut();
-        }
-
-        private void PrintSheets(string data_range, string title_text)
-        {
-            xl.Range print_range = _source_workbook.Sheets["einteilung"].Range[data_range];
-            foreach (xl.Range cell in print_range)
-            {
-                double? copies = cell.Value2;
-                if (copies > 0)
-                {
-                    int row = cell.Row - print_range.Row + 1;
-                    _temp_workbook.Sheets[row].Shapes.Item["TextField"].TextFrame.Characters.Text = title_text;
-                    _temp_workbook.Sheets[row].PrintOut(Copies: copies);
-                }
-            }
+            _tmp_wkb.Sheets["trennblatt"].PrintOut();
         }
     }
 }

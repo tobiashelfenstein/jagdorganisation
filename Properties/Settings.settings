@@ -1,7 +1,39 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Jagdorganisation.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="HuntingGroups" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C6:D35</Value>
+    </Setting>
+    <Setting Name="DataSheet" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">einteilung</Value>
+    </Setting>
+    <Setting Name="TemplateSheet" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">standkarte</Value>
+    </Setting>
+    <Setting Name="SheetPassword" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">password</Value>
+    </Setting>
+    <Setting Name="NumberCell" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">B15</Value>
+    </Setting>
+    <Setting Name="LeaderCell" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C15</Value>
+    </Setting>
+    <Setting Name="Leader" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">E6:E35</Value>
+    </Setting>
+    <Setting Name="Shooters" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">G6:G35</Value>
+    </Setting>
+    <Setting Name="Dogs" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">I6:I35</Value>
+    </Setting>
+    <Setting Name="Reserves" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">J6:J35</Value>
+    </Setting>
+    <Setting Name="NumberColumn" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">A</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

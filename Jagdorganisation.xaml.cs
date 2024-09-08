@@ -12,15 +12,23 @@ namespace Jagdorganisation
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly CheckBox[] _checkboxes;
+        private struct DivisionData
+        {
+            public string Filename;
+            public List<string> Checkboxes;
+            public bool Separator;
+        }
 
+        private readonly CheckBox[] _checkboxes;
         private readonly BackgroundWorker _worker;
         private HunterGroupPrinter _printer;
+
         public MainWindow()
         {
             InitializeComponent();
 
             // initialize CheckBox array
+            // separator CheckBox is intentionally not included
             _checkboxes = new CheckBox[] {
                 LeaderCheckBox,
                 ShootersCheckBox,
@@ -41,13 +49,6 @@ namespace Jagdorganisation
             _worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
         }
 
-        struct DivisionData
-        {
-            public string Filename;
-            public List<string> Checkboxes;
-            public bool? Separator;
-        }
-
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
@@ -55,21 +56,27 @@ namespace Jagdorganisation
 
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            (sender as BackgroundWorker).ReportProgress(10, "Einteilungsdatei wird verarbeitet");
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            worker.ReportProgress(10, "Einteilungsdatei wird verarbeitet");
+
             _printer = new HunterGroupPrinter();
             _printer.CreateCardsFromSource(((DivisionData)e.Argument).Filename);
 
             int progress = (100 - 20) / ((DivisionData)e.Argument).Checkboxes.Count;
             for (int i = 0; i < ((DivisionData)e.Argument).Checkboxes.Count; i++)
             {
-                if (!(sender as BackgroundWorker).CancellationPending)
+                if (worker.CancellationPending)
                 {
-                    (sender as BackgroundWorker).ReportProgress(10 + ((i + 1) * progress), ((DivisionData)e.Argument).Checkboxes[i] + " werden gedruckt");
-                    PrintGroups(((DivisionData)e.Argument).Checkboxes[i], ((DivisionData)e.Argument).Separator);
+                    e.Cancel = true;
+                    return;
                 }
+
+                worker.ReportProgress(10 + ((i + 1) * progress), ((DivisionData)e.Argument).Checkboxes[i] + " werden gedruckt");
+                PrintGroups(((DivisionData)e.Argument).Checkboxes[i], ((DivisionData)e.Argument).Separator);
             }
 
-            (sender as BackgroundWorker).ReportProgress(100, "Fertig");
+            worker.ReportProgress(100, "Fertig");
         }
 
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -82,23 +89,23 @@ namespace Jagdorganisation
         {
             if (e.Cancelled)
             {
-                // TODO: RaceCondition -> beste Möglichkeit?
                 MessageBox.Show(this, "Druck unterbrochen!", "Jagdorganisation", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
             {
                 MessageBox.Show(this, "Alle Gruppeneinteilungen wurden gedruckt!", "Jagdorganisation", MessageBoxButton.OK, MessageBoxImage.Information);
-                ProgressBar.Value = 0;
-                StatusInfoText.Content = "keine Einteilung geladen";
-
-                // unlock user interface, only abort is disabled
-                LockUserInterface(false);
             }
+
+            ResetInterface();
         }
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
             // see https://automationtesting.in/row-count-excel-using-c/
+
+            // data in this process
+            // division because of the source type
+            DivisionData div_data = new DivisionData();
 
             // check, if at least one CheckBox is checked
             if (Array.TrueForAll(_checkboxes, IsCheckBoxSelected))
@@ -106,8 +113,6 @@ namespace Jagdorganisation
                 MessageBox.Show(this, "Keine Gruppe ausgewählt!", "Jagdorganisation", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-            DivisionData division;
 
             // select only excel files
             Microsoft.Win32.OpenFileDialog open_dialog = new Microsoft.Win32.OpenFileDialog
@@ -127,24 +132,24 @@ namespace Jagdorganisation
             LockUserInterface(true);
 
             // define selected file as source file
-            division.Filename = open_dialog.FileName;
+            div_data.Filename = open_dialog.FileName;
 
             // create array with checkboxes for printing groups
-            division.Checkboxes = new List<string>();
-            division.Separator = SeparatorCheckBox.IsChecked;
+            div_data.Checkboxes = new List<string>();
+            div_data.Separator = SeparatorCheckBox.IsChecked ?? false;
             foreach (CheckBox box in _checkboxes)
             {
                 if (box.IsChecked == true)
                 {
-                    division.Checkboxes.Add(box.Content.ToString());
+                    div_data.Checkboxes.Add(box.Content.ToString());
                 }
             }
 
             // process all data
-            _worker.RunWorkerAsync(division);
+            _worker.RunWorkerAsync(div_data);
         }
 
-        private void PrintGroups(string group, bool? separator)
+        private void PrintGroups(string group, bool separator)
         {
             // print out if the box is checked
             _printer.PrintCards(group, separator);
@@ -162,6 +167,16 @@ namespace Jagdorganisation
 
             // but enable the cancel button
             AbortButton.IsEnabled = locking;
+
+            // also disbale all checkboxes, when locking is true
+            foreach (CheckBox box in _checkboxes)
+            {
+                box.IsEnabled = !locking;
+            }
+
+            // disbale separator CheckBox manually
+            // because its not included in _checkbox
+            SeparatorCheckBox.IsEnabled = !locking;
         }
 
         private void AbortButton_Click(object sender, RoutedEventArgs e)
@@ -179,6 +194,26 @@ namespace Jagdorganisation
             // only unchecked boxes return true
             // also null returns true
             return !box.IsChecked ?? true;
+        }
+
+        private void ResetInterface()
+        {
+            // reset ProgressBar and status label
+            ProgressBar.Value = 0;
+            StatusInfoText.Content = "keine Einteilung geladen";
+
+            // unlock user interface, only abort is disabled
+            LockUserInterface(false);
+
+            // reset all checkboxes
+            foreach (CheckBox box in _checkboxes)
+            {
+                box.IsChecked = false;
+            }
+
+            // reset separator CheckBox manually
+            // because its not included in _checkbox
+            SeparatorCheckBox.IsChecked = false;
         }
     }
 }
