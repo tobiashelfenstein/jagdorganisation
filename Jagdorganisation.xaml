@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Jagdorganisation"
         mc:Ignorable="d"
-        Title="Jagdorganisation" Height="262" Width="300">
+        Title="Jagdorganisation" Height="262" Width="300" ResizeMode="NoResize" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>

@@ -15,8 +15,8 @@ namespace Jagdorganisation
         private struct DivisionData
         {
             public string Filename;
-            public List<string> Checkboxes;
             public bool Separator;
+            public List<string> Checkboxes;
         }
 
         private readonly CheckBox[] _checkboxes;
@@ -73,7 +73,9 @@ namespace Jagdorganisation
                 }
 
                 worker.ReportProgress(10 + ((i + 1) * progress), ((DivisionData)e.Argument).Checkboxes[i] + " werden gedruckt");
-                PrintGroups(((DivisionData)e.Argument).Checkboxes[i], ((DivisionData)e.Argument).Separator);
+                _printer.PrintCards(((DivisionData)e.Argument).Checkboxes[i], ((DivisionData)e.Argument).Separator);
+                
+                Thread.Sleep(30 * 1000);
             }
 
             worker.ReportProgress(100, "Fertig");
@@ -89,11 +91,26 @@ namespace Jagdorganisation
         {
             if (e.Cancelled)
             {
-                MessageBox.Show(this, "Druck unterbrochen!", "Jagdorganisation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show
+                (
+                    this,
+                    "Druck wurde abgebrochen! " +
+                    "Erfolgreich erstelle Karten befinden sich im Drucker.",
+                    "Jagdorganisation",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
             }
             else
             {
-                MessageBox.Show(this, "Alle Gruppeneinteilungen wurden gedruckt!", "Jagdorganisation", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show
+                (
+                    this,
+                    "Alle Gruppeneinteilungen wurden gedruckt!",
+                    "Jagdorganisation",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information
+                );
             }
 
             ResetInterface();
@@ -103,26 +120,27 @@ namespace Jagdorganisation
         {
             // see https://automationtesting.in/row-count-excel-using-c/
 
-            // data in this process
-            // division because of the source type
-            DivisionData div_data = new DivisionData();
-
             // check, if at least one CheckBox is checked
             if (Array.TrueForAll(_checkboxes, IsCheckBoxSelected))
             {
-                MessageBox.Show(this, "Keine Gruppe ausgewählt!", "Jagdorganisation", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show
+                (
+                    this,
+                    "Keine Gruppe ausgewählt!",
+                    "Jagdorganisation",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+
                 return;
             }
 
-            // select only excel files
             Microsoft.Win32.OpenFileDialog open_dialog = new Microsoft.Win32.OpenFileDialog
             {
                 Title = "Jagdeinteilung laden",
                 Filter = "Jagdeinteilung (.xlsx)|*.xlsx"
             };
 
-            // show open file dialog box
-            // if user has canceld file selection, exit print action
             if (open_dialog.ShowDialog() != true)
             {
                 return;
@@ -131,12 +149,12 @@ namespace Jagdorganisation
             // lock user interface, only abort is enabled
             LockUserInterface(true);
 
-            // define selected file as source file
+            DivisionData div_data = new DivisionData();
             div_data.Filename = open_dialog.FileName;
-
-            // create array with checkboxes for printing groups
-            div_data.Checkboxes = new List<string>();
             div_data.Separator = SeparatorCheckBox.IsChecked ?? false;
+
+            // create list with checkbox discription for printing groups
+            div_data.Checkboxes = new List<string>();
             foreach (CheckBox box in _checkboxes)
             {
                 if (box.IsChecked == true)
@@ -145,16 +163,12 @@ namespace Jagdorganisation
                 }
             }
 
-            // process all data
             _worker.RunWorkerAsync(div_data);
         }
 
         private void PrintGroups(string group, bool separator)
         {
-            // print out if the box is checked
             _printer.PrintCards(group, separator);
-
-            // timer before next print action
             Thread.Sleep(30 * 1000);
         }
 
@@ -198,22 +212,37 @@ namespace Jagdorganisation
 
         private void ResetInterface()
         {
-            // reset ProgressBar and status label
             ProgressBar.Value = 0;
             StatusInfoText.Content = "keine Einteilung geladen";
 
             // unlock user interface, only abort is disabled
             LockUserInterface(false);
 
-            // reset all checkboxes
-            foreach (CheckBox box in _checkboxes)
+            /*foreach (CheckBox box in _checkboxes)
             {
                 box.IsChecked = false;
             }
 
             // reset separator CheckBox manually
             // because its not included in _checkbox
-            SeparatorCheckBox.IsChecked = false;
+            SeparatorCheckBox.IsChecked = false;*/
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if (_worker.IsBusy)
+            {
+                e.Cancel = true;
+                MessageBox.Show
+                (
+                    this,
+                    "Die Anwendung kann nicht geschlossen werden, " + 
+                    "da der Druckprozess gestartet wurde!",
+                    "Jagdorganisation",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
         }
     }
 }
