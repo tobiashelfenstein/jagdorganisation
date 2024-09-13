@@ -1,0 +1,51 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Jagdorganisation"
+        xmlns:p="clr-namespace:Jagdorganisation.Properties" xmlns:Configuration="clr-namespace:System.Configuration;assembly=System" x:Name="PreferencesWindow" x:Class="Jagdorganisation.SettingsWindow"
+        mc:Ignorable="d"
+        Title="Jagdorganisation: Einstellungen" Height="551" Width="528" ResizeMode="NoResize">
+    <Grid>
+        <GroupBox Header="Blattnamen und Passwortschutz" HorizontalAlignment="Left" Height="145" Margin="10,10,0,0" VerticalAlignment="Top" Width="480">
+            <Grid x:Name="SheetGrid" HorizontalAlignment="Left" Height="237" Margin="4,-7,0,0" VerticalAlignment="Top" Width="466">
+                <TextBox Text="{Binding DataSheet, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="0,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Blattname für Einteilungsliste:" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <TextBox Text="{Binding TemplateSheet, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="0,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Blattname für Standkarte:" HorizontalAlignment="Left" Margin="0,72,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <TextBox Text="{Binding SheetPassword, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="260,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Kennwort für Blattschutz:" HorizontalAlignment="Left" Margin="260,15,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="EditButton" Content="Bearbeiten" HorizontalAlignment="Left" Margin="11,480,0,0" VerticalAlignment="Top" Width="100" Click="EditButton_Click" Height="26" />
+        <GroupBox Header="Felder und Spalten der Einteilungsliste" HorizontalAlignment="Left" Height="205" Margin="10,170,0,0" VerticalAlignment="Top" Width="480">
+            <Grid x:Name="DivisionGrid" HorizontalAlignment="Left" Height="327" Margin="4,-7,-2,0" VerticalAlignment="Top" Width="466">
+                <TextBox Text="{Binding HuntingGroups, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="0,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Gruppeneinteilung:" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <TextBox Text="{Binding Shooters, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="0,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Standschützen:" HorizontalAlignment="Left" Margin="0,72,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <TextBox Text="{Binding Leader, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="260,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Ansteller:" HorizontalAlignment="Left" Margin="260,15,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <TextBox Text="{Binding Dogs, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="260,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Hundeführer:" HorizontalAlignment="Left" Margin="260,72,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <TextBox Text="{Binding Reserves, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="0,155,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Ersatzstände:" HorizontalAlignment="Left" Margin="0,129,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <TextBox Text="{Binding NumberColumn, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="260,155,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Gruppennummern:" HorizontalAlignment="Left" Margin="260,129,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Felder und Spalten der Standkarte" HorizontalAlignment="Left" Height="89" Margin="10,386,0,0" VerticalAlignment="Top" Width="480">
+            <Grid x:Name="TemplateGrid" HorizontalAlignment="Left" Height="237" Margin="4,-7,0,0" VerticalAlignment="Top" Width="466">
+                <TextBox Text="{Binding NumberCell, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="0,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Gruppennummer:" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <TextBox Text="{Binding LeaderCell, Mode=TwoWay, Source={x:Static p:Settings.Default}}" HorizontalAlignment="Left" Margin="260,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" IsEnabled="False" Height="26" VerticalContentAlignment="Center" />
+                <Label Content="Ansteller:" HorizontalAlignment="Left" Margin="260,15,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="SaveButton" Content="Speichern" HorizontalAlignment="Left" Margin="116,480,0,0" VerticalAlignment="Top" Width="100" Click="SaveButton_Click" Height="26" IsEnabled="False" />
+        <Button x:Name="AbortButton" Content="Abbrechen" HorizontalAlignment="Left" Margin="221,480,0,0" VerticalAlignment="Top" Width="100" Click="AbortButton_Click" Height="26" IsEnabled="False" />
+        <Button x:Name="CloseButton" Content="Schließen" HorizontalAlignment="Left" Margin="390,480,0,0" VerticalAlignment="Top" Width="100" Click="CloseButton_Click" Height="26" />
+
+    </Grid>
+</Window>

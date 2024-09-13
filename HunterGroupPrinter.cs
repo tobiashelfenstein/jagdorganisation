@@ -58,28 +58,23 @@ namespace Jagdorganisation
             string number_cell = Properties.Settings.Default.NumberCell; // GRUPPENNUMMER
             string leader_cell = Properties.Settings.Default.LeaderCell; // ANSTELLER
 
-            // first open source file with all data
             _src_wkb = _workbooks.Open(src_file);
             xl.Worksheet src_sht = _src_wkb.Sheets[_data_sht_name];
 
-            // then create temporary workbook with separator sheet
             _tmp_wkb = CreateTmpWkbWithSeparator();
 
-            // now copy hunter sheet for every group
+            // copy hunter sheet for every group
             xl.Range src_range = src_sht.Range[grp_range_str];
             foreach (xl.Range cell in src_range)
             {
-                // when the row has no entry, skip this iteration step
                 if (cell.Text == "")
                 {
                     continue;
                 }
 
-                // copy sheet after the last sheet in workbook
                 xl.Worksheet last_sht = _tmp_wkb.Sheets[_tmp_wkb.Sheets.Count];
                 _src_wkb.Sheets[_tmpl_sht_name].Copy(Before: last_sht);
 
-                // get the active sheet as copied sheet
                 xl.Worksheet cp_sht = _tmp_wkb.ActiveSheet;
 
                 // unlock sheet if locked
@@ -89,7 +84,6 @@ namespace Jagdorganisation
                     cp_sht.Unprotect(sht_password);
                 }
 
-                // modify the copied sheet
                 cp_sht.Name = cell.Text;
                 cp_sht.Range[number_cell].Value2 = src_sht.Range[number_clmn + cell.Row].Value2; // A + 3 = A3
                 cp_sht.Range[leader_cell].Value2 = cell.Text;
@@ -101,7 +95,6 @@ namespace Jagdorganisation
             // create temporary workbook with only one sheet
             xl.Workbook workbook = _workbooks.Add();
 
-            // set up first sheet as separator
             workbook.Sheets[1].Name = "Trennblatt";
             workbook.Sheets[1].Cells[1, 1].Value = "Trennblatttext";
             workbook.Sheets[1].Cells[1, 1].Font.Name = "Arial";
@@ -118,7 +111,6 @@ namespace Jagdorganisation
             // determine group type title and data range for printing
             PrintData prt_data = DeterminePrintData(group);
 
-            // print out separator
             if (separator)
             {
                 PrintSeparator(group);
@@ -170,10 +162,7 @@ namespace Jagdorganisation
 
         private void PrintSeparator(string separator_text)
         {
-            // change separator text
             _tmp_wkb.Sheets["trennblatt"].Cells[1, 1].Value = separator_text;
-
-            // print out
             _tmp_wkb.Sheets["trennblatt"].PrintOut();
         }
     }

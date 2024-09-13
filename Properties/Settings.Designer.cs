@@ -23,102 +23,135 @@ namespace Jagdorganisation.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("C6:D35")]
         public string HuntingGroups {
             get {
                 return ((string)(this["HuntingGroups"]));
             }
+            set {
+                this["HuntingGroups"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("einteilung")]
         public string DataSheet {
             get {
                 return ((string)(this["DataSheet"]));
             }
+            set {
+                this["DataSheet"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("standkarte")]
         public string TemplateSheet {
             get {
                 return ((string)(this["TemplateSheet"]));
             }
+            set {
+                this["TemplateSheet"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("password")]
         public string SheetPassword {
             get {
                 return ((string)(this["SheetPassword"]));
             }
+            set {
+                this["SheetPassword"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("B15")]
         public string NumberCell {
             get {
                 return ((string)(this["NumberCell"]));
             }
+            set {
+                this["NumberCell"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("C15")]
         public string LeaderCell {
             get {
                 return ((string)(this["LeaderCell"]));
             }
+            set {
+                this["LeaderCell"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("E6:E35")]
         public string Leader {
             get {
                 return ((string)(this["Leader"]));
             }
+            set {
+                this["Leader"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("G6:G35")]
         public string Shooters {
             get {
                 return ((string)(this["Shooters"]));
             }
+            set {
+                this["Shooters"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("I6:I35")]
         public string Dogs {
             get {
                 return ((string)(this["Dogs"]));
             }
+            set {
+                this["Dogs"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("J6:J35")]
         public string Reserves {
             get {
                 return ((string)(this["Reserves"]));
             }
+            set {
+                this["Reserves"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("A")]
         public string NumberColumn {
             get {
                 return ((string)(this["NumberColumn"]));
+            }
+            set {
+                this["NumberColumn"] = value;
             }
         }
     }

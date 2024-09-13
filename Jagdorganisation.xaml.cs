@@ -149,12 +149,14 @@ namespace Jagdorganisation
             // lock user interface, only abort is enabled
             LockUserInterface(true);
 
-            DivisionData div_data = new DivisionData();
-            div_data.Filename = open_dialog.FileName;
-            div_data.Separator = SeparatorCheckBox.IsChecked ?? false;
+            DivisionData div_data = new DivisionData
+            {
+                Filename = open_dialog.FileName,
+                Separator = SeparatorCheckBox.IsChecked ?? false,
+                Checkboxes = new List<string>()
+            };
 
             // create list with checkbox discription for printing groups
-            div_data.Checkboxes = new List<string>();
             foreach (CheckBox box in _checkboxes)
             {
                 if (box.IsChecked == true)
@@ -164,12 +166,6 @@ namespace Jagdorganisation
             }
 
             _worker.RunWorkerAsync(div_data);
-        }
-
-        private void PrintGroups(string group, bool separator)
-        {
-            _printer.PrintCards(group, separator);
-            Thread.Sleep(30 * 1000);
         }
 
         private void LockUserInterface(bool locking)
@@ -217,15 +213,6 @@ namespace Jagdorganisation
 
             // unlock user interface, only abort is disabled
             LockUserInterface(false);
-
-            /*foreach (CheckBox box in _checkboxes)
-            {
-                box.IsChecked = false;
-            }
-
-            // reset separator CheckBox manually
-            // because its not included in _checkbox
-            SeparatorCheckBox.IsChecked = false;*/
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -243,6 +230,12 @@ namespace Jagdorganisation
                     MessageBoxImage.Error
                 );
             }
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow settings_dlg = new SettingsWindow();
+            settings_dlg.Show();
         }
     }
 }
