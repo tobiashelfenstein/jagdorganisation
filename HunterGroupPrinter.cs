@@ -75,7 +75,6 @@ namespace Jagdorganisation
                 if (cell.Text == "")
                 {
                     break;
-                    //continue;
                 }
 
                 xl.Worksheet last_sht = _tmp_wkb.Sheets[_tmp_wkb.Sheets.Count];
@@ -90,10 +89,6 @@ namespace Jagdorganisation
                     cp_sht.Unprotect(sht_password);
                 }
 
-                //cp_sht.Name = cell.Text;
-                //System.Console.WriteLine(Regex.Replace(cell.Text, "[/\\\\:=(){}\\[\\]*?\" <>|']", "_"));
-                //System.Console.WriteLine(Regex.Replace(cell.Text, SPECIAL_CHARS, "_"));
-                //cp_sht.Name = Regex.Replace(cell.Text, SPECIAL_CHARS, "_");
                 cp_sht.Name = ModifyUnwantedNames(cell.Text);
                 cp_sht.Range[number_cell].Value2 = src_sht.Range[number_clmn + cell.Row].Value2; // A + 3 = A3
                 cp_sht.Range[leader_cell].Value2 = cell.Text;
@@ -178,20 +173,12 @@ namespace Jagdorganisation
 
         private string ModifyUnwantedNames(string name)
         {
-            if (String.IsNullOrWhiteSpace(name) || String.IsNullOrEmpty(name))
-            {
-                // if the string is empty or contains only whitespaces
-                // use GUID as unique serial number for sheet names
-                name = Guid.NewGuid().ToString();
-            }
-            else
-            {
-                name = Regex.Replace(name, SPECIAL_CHARS, "_");
-            }
-
             // guid strings as well as regular names
             // may not longer than 30 characters
-            return name.Substring(0, Math.Min(name.Length, 30));
+            name = name.Substring(0, Math.Min(name.Length, 30));
+            name = Regex.Replace(name, SPECIAL_CHARS, "_");
+
+            return name;
         }
     }
 }
