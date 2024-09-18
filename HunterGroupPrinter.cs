@@ -1,10 +1,15 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using xl = Microsoft.Office.Interop.Excel;
 
 namespace Jagdorganisation
 {
     public class HunterGroupPrinter
     {
+        // define unwanted characters for excel sheet names
+        // for C# and regex double backslash needed
+        private const string SPECIAL_CHARS = "[/\\\\:=(){}\\[\\]*?\" <>|']";
         private struct PrintData
         {
             public string Title;
@@ -69,7 +74,8 @@ namespace Jagdorganisation
             {
                 if (cell.Text == "")
                 {
-                    continue;
+                    break;
+                    //continue;
                 }
 
                 xl.Worksheet last_sht = _tmp_wkb.Sheets[_tmp_wkb.Sheets.Count];
@@ -84,7 +90,11 @@ namespace Jagdorganisation
                     cp_sht.Unprotect(sht_password);
                 }
 
-                cp_sht.Name = cell.Text;
+                //cp_sht.Name = cell.Text;
+                //System.Console.WriteLine(Regex.Replace(cell.Text, "[/\\\\:=(){}\\[\\]*?\" <>|']", "_"));
+                //System.Console.WriteLine(Regex.Replace(cell.Text, SPECIAL_CHARS, "_"));
+                //cp_sht.Name = Regex.Replace(cell.Text, SPECIAL_CHARS, "_");
+                cp_sht.Name = ModifyUnwantedNames(cell.Text);
                 cp_sht.Range[number_cell].Value2 = src_sht.Range[number_clmn + cell.Row].Value2; // A + 3 = A3
                 cp_sht.Range[leader_cell].Value2 = cell.Text;
             }
@@ -108,7 +118,7 @@ namespace Jagdorganisation
 
         public void PrintCards(string group, bool separator)
         {
-            // determine group type title and data range for printing
+            // determine group title and data range for printing
             PrintData prt_data = DeterminePrintData(group);
 
             if (separator)
@@ -164,6 +174,24 @@ namespace Jagdorganisation
         {
             _tmp_wkb.Sheets["trennblatt"].Cells[1, 1].Value = separator_text;
             _tmp_wkb.Sheets["trennblatt"].PrintOut();
+        }
+
+        private string ModifyUnwantedNames(string name)
+        {
+            if (String.IsNullOrWhiteSpace(name) || String.IsNullOrEmpty(name))
+            {
+                // if the string is empty or contains only whitespaces
+                // use GUID as unique serial number for sheet names
+                name = Guid.NewGuid().ToString();
+            }
+            else
+            {
+                name = Regex.Replace(name, SPECIAL_CHARS, "_");
+            }
+
+            // guid strings as well as regular names
+            // may not longer than 30 characters
+            return name.Substring(0, Math.Min(name.Length, 30));
         }
     }
 }

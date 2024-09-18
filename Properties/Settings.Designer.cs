@@ -25,7 +25,7 @@ namespace Jagdorganisation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C6:D35")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C6:C35")]
         public string HuntingGroups {
             get {
                 return ((string)(this["HuntingGroups"]));

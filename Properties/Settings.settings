@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="HuntingGroups" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C6:D35</Value>
+      <Value Profile="(Default)">C6:C35</Value>
     </Setting>
     <Setting Name="DataSheet" Type="System.String" Scope="User">
       <Value Profile="(Default)">einteilung</Value>
