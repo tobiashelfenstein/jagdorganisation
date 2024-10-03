@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +19,9 @@ namespace Jagdorganisation
             public bool Separator;
             public List<string> Checkboxes;
         }
+
+        private string _session_printer; // default printer for this session
+        private readonly string _default_printer; // user default printer
 
         private readonly CheckBox[] _checkboxes;
         private readonly BackgroundWorker _worker;
@@ -47,6 +51,13 @@ namespace Jagdorganisation
             _worker.DoWork += Worker_DoWork;
             _worker.ProgressChanged += Worker_ProgressChanged;
             _worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+
+            // save user default printer
+            StringBuilder defprt = new StringBuilder(256);
+            int size = defprt.Capacity;
+            WinPrintHelper.GetDefaultPrinter(defprt, ref size);
+            _default_printer = defprt.ToString();
+
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -74,7 +85,7 @@ namespace Jagdorganisation
 
                 worker.ReportProgress(10 + ((i + 1) * progress), ((DivisionData)e.Argument).Checkboxes[i] + " werden gedruckt");
                 _printer.PrintCards(((DivisionData)e.Argument).Checkboxes[i], ((DivisionData)e.Argument).Separator);
-                
+
                 Thread.Sleep(30 * 1000);
             }
 
@@ -113,6 +124,7 @@ namespace Jagdorganisation
                 );
             }
 
+            WinPrintHelper.SetDefaultPrinter(_default_printer);
             ResetInterface();
         }
 
@@ -135,6 +147,21 @@ namespace Jagdorganisation
                 return;
             }
 
+            PrinterSelection printer_dialog = new PrinterSelection();
+            if (printer_dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            _session_printer = printer_dialog.SelectedPrinter;
+            PrinterHelper.SetDefaultPrinter(_session_printer);
+
+            var devMode = PrinterHelper.GetPrinterDevMode(null);
+            string s = String.Format("{0} ist Duplex: {1}", devMode.dmDeviceName, devMode.dmDuplex);
+            Console.WriteLine(s);
+
+
+
             Microsoft.Win32.OpenFileDialog open_dialog = new Microsoft.Win32.OpenFileDialog
             {
                 Title = "Jagdeinteilung laden",
@@ -154,7 +181,7 @@ namespace Jagdorganisation
                 Filename = open_dialog.FileName,
                 Separator = SeparatorCheckBox.IsChecked ?? false,
                 Checkboxes = new List<string>()
-            };
+        };
 
             // create list with checkbox discription for printing groups
             foreach (CheckBox box in _checkboxes)
@@ -223,7 +250,7 @@ namespace Jagdorganisation
                 MessageBox.Show
                 (
                     this,
-                    "Die Anwendung kann nicht geschlossen werden, " + 
+                    "Die Anwendung kann nicht geschlossen werden, " +
                     "da der Druckprozess gestartet wurde!",
                     "Jagdorganisation",
                     MessageBoxButton.OK,

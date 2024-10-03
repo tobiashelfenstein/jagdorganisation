@@ -32,6 +32,9 @@ namespace Jagdorganisation
             // read from config
             _data_sht_name = Properties.Settings.Default.DataSheet;
             _tmpl_sht_name = Properties.Settings.Default.TemplateSheet;
+
+            //_xlApp.ActivePrinter = printer;
+            Console.WriteLine(_xlApp.ActivePrinter);
         }
 
         ~HunterGroupPrinter()
