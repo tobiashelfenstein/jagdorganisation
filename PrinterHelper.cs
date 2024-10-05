@@ -6,6 +6,8 @@ using System.ComponentModel;
 
 namespace Jagdorganisation
 {
+    // see https://gist.github.com/huanlin/5671168
+
     /// <summary>
     /// Origin: http://blog.csdn.net/csui2008/article/details/5718461
     /// Modified and a little tested by Huan-Lin Tsai. May-29-2013.
@@ -144,6 +146,12 @@ namespace Jagdorganisation
             DMORIENT_LANDSCAPE = 2,//橫向
         }
 
+        public enum ColorMode
+        {
+            DMCOLOR_COLOR = 2,
+            DMCOLOR_MONOCHROME = 1,
+        }
+
         /// <summary>
         /// 紙張類型
         /// </summary>
@@ -220,31 +228,24 @@ namespace Jagdorganisation
             DMRES_HIGH = -4
         }
 
-
-        /// <summary>
-        /// 是否要雙面列印
-        /// </summary>
         public enum PageDuplex
         {
-            DMDUP_HORIZONTAL = 3,
-            DMDUP_SIMPLEX = 1,
-            DMDUP_VERTICAL = 2
+            DMDUP_HORIZONTAL = 3, // Short-edge binding, that is, the long edge of the page is horizontal
+            DMDUP_SIMPLEX = 1, // Normal (nonduplex) printing
+            DMDUP_VERTICAL = 2 // Long-edge binding, that is, the long edge of the page is vertical
         }
 
-
-        /// <summary>
-        /// 需要變更的列印參數
-        /// </summary>
         public struct PrinterSettingsInfo
         {
-            public PageOrientation Orientation; //列印方向
-            public PaperSize Size;              //列印紙張類型（用數字表示 256為用戶自定紙張）
-            public PaperSource source;          //紙張來源
-            public PageDuplex Duplex;           //是否雙面列印等信息
-            public int pLength;                 //紙張的高
-            public int pWidth;                  //紙張的寬
-            public int pmFields;                //需改變的信息進行"|"運算後的和
-            public string pFormName;            //紙張的名字
+            public PageOrientation Orientation;
+            public PaperSize Size;
+            public PaperSource source;
+            public PageDuplex Duplex;
+            public ColorMode Color;
+            public int pLength;
+            public int pWidth;
+            public int pmFields;
+            public string pFormName;
         }
 
         //PRINTER_INFO_2 - 印表機信息結構包含 1..9 個等級，詳細信息請參考API
@@ -369,6 +370,7 @@ namespace Jagdorganisation
         const int DM_PAPERWIDTH = 0x0008;//改變紙張寬度時需在dmFields設置此常數
         const int DM_DUPLEX = 0x1000;//改變紙張是否雙面列印時需在dmFields設置此常數
         const int DM_ORIENTATION = 0x0001;//改變紙張方向時需在dmFields設置此常數
+        const int DM_COLOR = 0x0001;
 
         //用於改變DocumentProperties的參數，詳細信息請參考API
         const int DM_IN_BUFFER = 8;
@@ -582,6 +584,11 @@ namespace Jagdorganisation
                     {
                         dm.dmOrientation = (short)prnSettings.Orientation;
                         dm.dmFields |= DM_ORIENTATION;
+                    }
+                    if ((int)prnSettings.Color != 0)
+                    {
+                        dm.dmColor = (short)prnSettings.Color;
+                        dm.dmFields |= DM_COLOR;
                     }
                     Marshal.StructureToPtr(dm, hDevMode, true);
 

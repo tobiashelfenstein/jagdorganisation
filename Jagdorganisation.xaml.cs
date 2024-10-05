@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,12 +19,10 @@ namespace Jagdorganisation
             public List<string> Checkboxes;
         }
 
-        private string _session_printer; // default printer for this session
-        private readonly string _default_printer; // user default printer
-
         private readonly CheckBox[] _checkboxes;
         private readonly BackgroundWorker _worker;
-        private HunterGroupPrinter _printer;
+        private PrintManager _printer;
+        private HunterGroupPrinter _creator;
 
         public MainWindow()
         {
@@ -52,12 +49,8 @@ namespace Jagdorganisation
             _worker.ProgressChanged += Worker_ProgressChanged;
             _worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
 
-            // save user default printer
-            StringBuilder defprt = new StringBuilder(256);
-            int size = defprt.Capacity;
-            WinPrintHelper.GetDefaultPrinter(defprt, ref size);
-            _default_printer = defprt.ToString();
-
+            // start print manager
+            _printer = new PrintManager();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -71,8 +64,8 @@ namespace Jagdorganisation
 
             worker.ReportProgress(10, "Einteilungsdatei wird verarbeitet");
 
-            _printer = new HunterGroupPrinter();
-            _printer.CreateCardsFromSource(((DivisionData)e.Argument).Filename);
+            _creator = new HunterGroupPrinter();
+            _creator.CreateCardsFromSource(((DivisionData)e.Argument).Filename);
 
             int progress = (100 - 20) / ((DivisionData)e.Argument).Checkboxes.Count;
             for (int i = 0; i < ((DivisionData)e.Argument).Checkboxes.Count; i++)
@@ -84,7 +77,7 @@ namespace Jagdorganisation
                 }
 
                 worker.ReportProgress(10 + ((i + 1) * progress), ((DivisionData)e.Argument).Checkboxes[i] + " werden gedruckt");
-                _printer.PrintCards(((DivisionData)e.Argument).Checkboxes[i], ((DivisionData)e.Argument).Separator);
+                _creator.PrintCards(((DivisionData)e.Argument).Checkboxes[i], ((DivisionData)e.Argument).Separator);
 
                 Thread.Sleep(30 * 1000);
             }
@@ -124,7 +117,7 @@ namespace Jagdorganisation
                 );
             }
 
-            WinPrintHelper.SetDefaultPrinter(_default_printer);
+            _printer.ResetDefaultPrinter();
             ResetInterface();
         }
 
@@ -153,11 +146,11 @@ namespace Jagdorganisation
                 return;
             }
 
-            _session_printer = printer_dialog.SelectedPrinter;
-            PrinterHelper.SetDefaultPrinter(_session_printer);
+            _printer.SetSessionPrinter(printer_dialog.SelectedPrinter);
+            _printer.SetPrinterSettings(PrinterHelper.ColorMode.DMCOLOR_MONOCHROME, PrinterHelper.PageDuplex.DMDUP_SIMPLEX);
 
             var devMode = PrinterHelper.GetPrinterDevMode(null);
-            string s = String.Format("{0} ist Duplex: {1}", devMode.dmDeviceName, devMode.dmDuplex);
+            string s = String.Format("{0} ist Color: {1}", devMode.dmDeviceName, devMode.dmColor);
             Console.WriteLine(s);
 
 
@@ -181,7 +174,7 @@ namespace Jagdorganisation
                 Filename = open_dialog.FileName,
                 Separator = SeparatorCheckBox.IsChecked ?? false,
                 Checkboxes = new List<string>()
-        };
+            };
 
             // create list with checkbox discription for printing groups
             foreach (CheckBox box in _checkboxes)
