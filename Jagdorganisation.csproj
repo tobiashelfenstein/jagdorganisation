@@ -65,7 +65,7 @@
       <DependentUpon>PreferencesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="PrinterHelper.cs" />
-    <Compile Include="PrintManager.cs" />
+    <Compile Include="PrintSettings.cs" />
     <Compile Include="WinPrintHelper.cs" />
     <Page Include="Jagdorganisation.xaml">
       <Generator>MSBuild:Compile</Generator>

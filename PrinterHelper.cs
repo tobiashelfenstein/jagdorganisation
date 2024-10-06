@@ -559,6 +559,11 @@ namespace Jagdorganisation
                 }
                 else
                 {
+                    // test
+                    dm.dmDuplex = (short)prnSettings.Duplex;
+                    dm.dmFields |= DM_DUPLEX;
+                    Console.WriteLine(dm.dmDuplex);
+
                     // 更改印表機設定
                     if ((int)prnSettings.Size != 0) //是否改變紙張類型
                     {

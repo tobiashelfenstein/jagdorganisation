@@ -5,11 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Jagdorganisation"
         mc:Ignorable="d"
-        Title="Jagdorganisation: Druckerauswahl" Height="332" Width="309">
+        Title="Jagdorganisation: Druckerauswahl" Height="337" Width="559">
     <Grid>
-        <ListBox x:Name="PrinterList" HorizontalAlignment="Left" Height="145" Margin="30,40,0,0" VerticalAlignment="Top" Width="185"/>
-        <Button x:Name="PrintButton" Content="Drucken" HorizontalAlignment="Left" Margin="30,215,0,0" VerticalAlignment="Top" Width="100" Height="26" Click="PrintButton_Click"/>
-        <Button x:Name="AbortButton" Content="Abbrechen" HorizontalAlignment="Left" Margin="160,225,0,0" VerticalAlignment="Top" Width="100" Height="26" IsCancel="True"/>
+        <GroupBox Header="Einstellungen" HorizontalAlignment="Left" Height="61" Margin="10,194,0,0" VerticalAlignment="Top" Width="520">
+            <Grid HorizontalAlignment="Left" Height="100" Margin="4,-7,-2,-23" VerticalAlignment="Top" Width="510">
+                <Label Content="Farbe:" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
+                <ComboBox x:Name="ColorSelection" ItemsSource="{Binding Color}" DisplayMemberPath="Key" SelectedValuePath="Value" HorizontalAlignment="Left" Margin="42,15,0,0" VerticalAlignment="Top" Width="150" Height="26" SelectedIndex="1" VerticalContentAlignment="Center"/>
+                <Label Content="Beidseitiger Druck:" HorizontalAlignment="Left" Margin="236,15,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="DuplexSelection" ItemsSource="{Binding Duplex}" DisplayMemberPath="Key" SelectedValuePath="Value" HorizontalAlignment="Left" Margin="350,15,0,0" VerticalAlignment="Top" Width="150" Height="26" SelectedIndex="0" VerticalContentAlignment="Center" RenderTransformOrigin="0.727,0.615"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Druckerauswahl" HorizontalAlignment="Left" Height="179" Margin="10,10,0,0" VerticalAlignment="Top" Width="520">
+            <Grid HorizontalAlignment="Left" Height="190" VerticalAlignment="Top" Width="510" Margin="4,-7,-2,-34">
+                <ListBox x:Name="PrinterList" HorizontalAlignment="Left" Height="145" VerticalAlignment="Top" Width="500" SelectedIndex="1" Margin="0,15,0,0"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="PrintButton" Content="Drucken" HorizontalAlignment="Left" Margin="325,260,0,0" VerticalAlignment="Top" Width="100" Height="26" Click="PrintButton_Click" IsDefault="True"/>
+        <Button x:Name="AbortButton" Content="Abbrechen" HorizontalAlignment="Left" Margin="430,260,0,0" VerticalAlignment="Top" Width="100" Height="26" IsCancel="True"/>
+        <Label HorizontalAlignment="Left" Margin="184,189,0,0" VerticalAlignment="Top" Padding="0,5,5,5"/>
 
     </Grid>
 </Window>

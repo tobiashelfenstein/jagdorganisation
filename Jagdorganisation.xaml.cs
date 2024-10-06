@@ -21,7 +21,7 @@ namespace Jagdorganisation
 
         private readonly CheckBox[] _checkboxes;
         private readonly BackgroundWorker _worker;
-        private PrintManager _printer;
+        private PrintSettings _printer;
         private HunterGroupPrinter _creator;
 
         public MainWindow()
@@ -50,7 +50,7 @@ namespace Jagdorganisation
             _worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
 
             // start print manager
-            _printer = new PrintManager();
+            _printer = new PrintSettings();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -146,12 +146,14 @@ namespace Jagdorganisation
                 return;
             }
 
-            _printer.SetSessionPrinter(printer_dialog.SelectedPrinter);
-            _printer.SetPrinterSettings(PrinterHelper.ColorMode.DMCOLOR_MONOCHROME, PrinterHelper.PageDuplex.DMDUP_SIMPLEX);
+            //_printer.SetSessionPrinter(printer_dialog.SelectedPrinter);
+            //_printer.SetPrinterSettings(PrinterHelper.ColorMode.DMCOLOR_MONOCHROME, PrinterHelper.PageDuplex.DMDUP_SIMPLEX);
 
             var devMode = PrinterHelper.GetPrinterDevMode(null);
-            string s = String.Format("{0} ist Color: {1}", devMode.dmDeviceName, devMode.dmColor);
+            string s = String.Format("{0} ist Duplex: {1}", devMode.dmDeviceName, devMode.dmDuplex);
             Console.WriteLine(s);
+
+            //return;
 
 
 
