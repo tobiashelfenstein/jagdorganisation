@@ -117,7 +117,10 @@ namespace Jagdorganisation
                 );
             }
 
+            // reset printer settings
+            _printer.RestorePrinterSettings();
             _printer.ResetDefaultPrinter();
+
             ResetInterface();
         }
 
@@ -146,15 +149,11 @@ namespace Jagdorganisation
                 return;
             }
 
-            //_printer.SetSessionPrinter(printer_dialog.SelectedPrinter);
-            //_printer.SetPrinterSettings(PrinterHelper.ColorMode.DMCOLOR_MONOCHROME, PrinterHelper.PageDuplex.DMDUP_SIMPLEX);
+            _printer.SessionPrinter = printer_dialog.Printer;
+            _printer.SessionColor = printer_dialog.ColorMode;
+            _printer.SessionDuplex = printer_dialog.PageDuplex;
 
-            var devMode = PrinterHelper.GetPrinterDevMode(null);
-            string s = String.Format("{0} ist Duplex: {1}", devMode.dmDeviceName, devMode.dmDuplex);
-            Console.WriteLine(s);
-
-            //return;
-
+            _printer.ActivateSessionPrinter();
 
 
             Microsoft.Win32.OpenFileDialog open_dialog = new Microsoft.Win32.OpenFileDialog

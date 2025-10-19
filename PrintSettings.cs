@@ -8,18 +8,19 @@ namespace Jagdorganisation
 {
     public class PrintSettings
     {
-        private string _session_printer; // default printer for this session
+        public string SessionPrinter { get; set; } // default printer for this session
         private readonly string _default_printer; // user default printer
 
-        private PrinterHelper.ColorMode _session_color;
-        private readonly PrinterHelper.ColorMode _default_color;
+        public PrinterHelper.ColorMode SessionColor { get; set; }
+        private PrinterHelper.ColorMode _default_color;
 
-        private PrinterHelper.PageDuplex _session_duplex;
-        private readonly PrinterHelper.PageDuplex _default_duplex;
+        public PrinterHelper.PageDuplex SessionDuplex { get; set; }
+        private PrinterHelper.PageDuplex _default_duplex;
 
         public PrintSettings()
         {
             // save user default printer
+            // color and duplex are printer specific
             _default_printer = PrinterHelper.GetDefaultPrinterName();
         }
 
@@ -27,18 +28,36 @@ namespace Jagdorganisation
         {
         }
 
-        public void SetSessionPrinter(string printer)
-        {
-            _session_printer = printer;
-            PrinterHelper.SetDefaultPrinter(printer);
-        }
-
         public void ResetDefaultPrinter()
         {
             PrinterHelper.SetDefaultPrinter(_default_printer);
         }
 
-        public void SetPrinterSettings(PrinterHelper.ColorMode color, PrinterHelper.PageDuplex duplex)
+        public void ActivateSessionPrinter()
+        {
+            // first set user selected printer as new default printer
+            // the save the printer settings
+            PrinterHelper.SetDefaultPrinter(SessionPrinter);
+            SavePrinterSettings();
+
+            // modify the printer with new settings for duplex and color
+            SetPrinterSettings(SessionDuplex, SessionColor);
+        }
+
+        public void SavePrinterSettings()
+        {
+            var devMode = PrinterHelper.GetPrinterDevMode(null);
+
+            _default_duplex = (PrinterHelper.PageDuplex)devMode.dmDuplex;
+            _default_color = (PrinterHelper.ColorMode)devMode.dmColor;
+        }
+
+        public void RestorePrinterSettings()
+        {
+            SetPrinterSettings(_default_duplex, _default_color);
+        }
+
+        private void SetPrinterSettings(PrinterHelper.PageDuplex duplex, PrinterHelper.ColorMode color)
         {
             PrinterHelper.PrinterSettingsInfo settings = new PrinterHelper.PrinterSettingsInfo
             {
@@ -46,7 +65,7 @@ namespace Jagdorganisation
                 Color = color
             };
 
-            PrinterHelper.ModifyPrinterSettings(_session_printer, ref settings);
+            PrinterHelper.ModifyPrinterSettings(SessionPrinter, ref settings);
         }
     }
 }
