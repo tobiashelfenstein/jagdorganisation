@@ -14,6 +14,7 @@ namespace Jagdorganisation
         {
             public string Title;
             public string Range;
+            public int Order;
         }
 
         private xl.Application _xlApp;
@@ -23,6 +24,7 @@ namespace Jagdorganisation
 
         private string _data_sht_name;
         private string _tmpl_sht_name;
+        private string _leader_sht_name;
         public HunterGroupPrinter()
         {
             // every new created workbook has only one sheet
@@ -32,6 +34,7 @@ namespace Jagdorganisation
             // read from config
             _data_sht_name = Properties.Settings.Default.DataSheet;
             _tmpl_sht_name = Properties.Settings.Default.TemplateSheet;
+            _leader_sht_name = "Ansteller";
 
             //_xlApp.ActivePrinter = printer;
             Console.WriteLine(_xlApp.ActivePrinter);
@@ -80,10 +83,34 @@ namespace Jagdorganisation
                     break;
                 }
 
-                xl.Worksheet last_sht = _tmp_wkb.Sheets[_tmp_wkb.Sheets.Count];
+                xl.Worksheet last_sht;
+                xl.Worksheet cp_sht;
+
+                // leader sheet
+                // TODO: Gruppenauswahl berücksichtigen
+                // TODO: Kopierfunktion verbessern
+                last_sht = _tmp_wkb.Sheets[_tmp_wkb.Sheets.Count];
+                _src_wkb.Sheets[_leader_sht_name].Copy(Before: last_sht);
+
+                cp_sht = _tmp_wkb.ActiveSheet;
+
+                // unlock sheet if locked
+                // new locking is not necessary
+                if (cp_sht.ProtectContents)
+                {
+                    cp_sht.Unprotect(sht_password);
+                }
+
+                cp_sht.Name = ModifyUnwantedNames("Ansteller_" + cell.Text);
+                cp_sht.Range[number_cell].Value2 = src_sht.Range[number_clmn + cell.Row].Value2; // A + 3 = A3
+                cp_sht.Range[leader_cell].Value2 = cell.Text;
+
+
+                // hunter sheet
+                last_sht = _tmp_wkb.Sheets[_tmp_wkb.Sheets.Count];
                 _src_wkb.Sheets[_tmpl_sht_name].Copy(Before: last_sht);
 
-                xl.Worksheet cp_sht = _tmp_wkb.ActiveSheet;
+                cp_sht = _tmp_wkb.ActiveSheet;
 
                 // unlock sheet if locked
                 // new locking is not necessary
@@ -125,6 +152,9 @@ namespace Jagdorganisation
             }
 
             // print sheets for specified group
+            // TODO: kein Eintrag in Name aber Zahlen eingetragen
+            // TODO: bei Leerzeile stimmt die Nummerierung nicht mehr
+            // Exception-Handling erforderlich
             xl.Range prt_range = _src_wkb.Sheets[_data_sht_name].Range[prt_data.Range];
             foreach (xl.Range cell in prt_range)
             {
@@ -133,6 +163,7 @@ namespace Jagdorganisation
                 if (copies > 0)
                 {
                     int row = cell.Row - prt_range.Row + 1; // + 1 is for current row
+                    row += prt_data.Order; // LEADERSHEET, HUNTERSHEET, LEADERSHEET, HUNTERSHEET ... SEPARATOR
                     _tmp_wkb.Sheets[row].Shapes.Item["TextField"].TextFrame.Characters.Text = prt_data.Title;
                     _tmp_wkb.Sheets[row].PrintOut(Copies: copies);
                 }
@@ -147,21 +178,25 @@ namespace Jagdorganisation
                 case "Ansteller":
                     data.Title = "Ansteller";
                     data.Range = Properties.Settings.Default.Leader;
+                    data.Order = 0;
                     break;
 
                 case "Standschützen":
                     data.Title = "Standkarte";
                     data.Range = Properties.Settings.Default.Shooters;
+                    data.Order = 1;
                     break;
 
                 case "Hundestände":
                     data.Title = "Hundestand";
                     data.Range = Properties.Settings.Default.Dogs;
+                    data.Order = 1;
                     break;
 
                 case "Ersatzstände":
                     data.Title = "Ersatzstand";
                     data.Range = Properties.Settings.Default.Reserves;
+                    data.Order = 1;
                     break;
             }
 
